@@ -27,7 +27,7 @@ class LLMConfig(ProviderConfig):
 
     @property
     def supported_providers(self) -> list[str]:
-        return ["litellm", "openai"]
+        return ["litellm", "openai", "openai_azure"]
 
 
 class LLMProvider(Provider):

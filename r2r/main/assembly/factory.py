@@ -68,6 +68,10 @@ class R2RProviderFactory:
             from r2r.providers.embeddings import OpenAIEmbeddingProvider
 
             embedding_provider = OpenAIEmbeddingProvider(embedding)
+        elif embedding.provider == "openai_azure":
+            from r2r.providers.embeddings import AzureOpenAIEmbeddingProvider
+
+            embedding_provider = AzureOpenAIEmbeddingProvider(embedding)
         elif embedding.provider == "ollama":
             from r2r.providers.embeddings import OllamaEmbeddingProvider
 
@@ -115,7 +119,7 @@ class R2RProviderFactory:
         self, llm_config: LLMConfig, *args, **kwargs
     ) -> LLMProvider:
         llm_provider: Optional[LLMProvider] = None
-        if llm_config.provider == "openai":
+        if llm_config.provider == "openai" or llm_config.provider == "openai_azure":
             from r2r.providers.llms import OpenAILLM
 
             llm_provider = OpenAILLM(llm_config)

@@ -4,9 +4,9 @@
     "max_file_size_in_mb": 32
   },
   "completions": {
-    "provider": "litellm",
+    "provider": "openai_azure",
     "generation_config": {
-      "model": "gpt-4o",
+      "model": "novaprime-qa-gpt-4o-1",
       "temperature": 0.1,
       "top_p": 1.0,
       "top_k": 100,
@@ -19,12 +19,13 @@
       "do_sample": true,
       "generate_with_chat": false,
       "add_generation_kwargs": {},
-      "api_base": null
+      "api_base": null,
+      "response_format": {"type": "json_object"}
     }
   },
   "embedding": {
-    "provider": "openai",
-    "base_model": "text-embedding-3-small",
+    "provider": "openai_azure",
+    "base_model": "novaprime-qa-text-embedding-3-small-1",
     "base_dimension": 512,
     "batch_size": 128,
     "text_splitter": {

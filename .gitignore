@@ -17,3 +17,5 @@ coverage.xml
 **/*.sqlite3*
 
 r2r/examples/data/*
+
+.idea

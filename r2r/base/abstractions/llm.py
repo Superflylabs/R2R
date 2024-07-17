@@ -17,9 +17,9 @@ class RAGCompletion:
     search_results: "AggregateSearchResult"
 
     def __init__(
-        self,
-        completion: LLMChatCompletion,
-        search_results: "AggregateSearchResult",
+            self,
+            completion: LLMChatCompletion,
+            search_results: "AggregateSearchResult",
     ):
         self.completion = completion
         self.search_results = search_results
@@ -41,6 +41,7 @@ class GenerationConfig(BaseModel):
         "generate_with_chat": False,
         "add_generation_kwargs": None,
         "api_base": None,
+        "response_format": None
     }
 
     model: str = Field(
@@ -92,6 +93,9 @@ class GenerationConfig(BaseModel):
     )
     api_base: Optional[str] = Field(
         default_factory=lambda: GenerationConfig._defaults["api_base"]
+    )
+    response_format: Optional[dict] = Field(
+        default_factory=lambda: GenerationConfig._defaults["response_format"]
     )
 
     @classmethod

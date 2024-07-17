@@ -11,6 +11,7 @@ from r2r.base import (
     LLMProvider,
 )
 from r2r.base.abstractions.llm import GenerationConfig
+from r2r.providers.llms.openai.openai_client_provider import OpenAILLMClientProvider
 
 logger = logging.getLogger(__name__)
 
@@ -34,18 +35,13 @@ class OpenAILLM(LLMProvider):
             raise ImportError(
                 "Error, `openai` is required to run an OpenAILLM. Please install it using `pip install openai`."
             )
-        if config.provider != "openai":
-            raise ValueError(
-                "OpenAILLM must be initialized with config with `openai` provider."
-            )
-        if not os.getenv("OPENAI_API_KEY"):
-            raise ValueError(
-                "OpenAI API key not found. Please set the OPENAI_API_KEY environment variable."
-            )
         super().__init__(config)
         self.config: LLMConfig = config
-        self.async_client = AsyncOpenAI()
-        self.client = OpenAI()
+
+        client_provider = OpenAILLMClientProvider(config)
+
+        self.async_client = client_provider.get_async_client()
+        self.client = client_provider.get_client()
 
     def get_completion(
         self,

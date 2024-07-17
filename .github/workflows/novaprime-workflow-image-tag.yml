@@ -1,0 +1,33 @@
+on:
+  workflow_call:
+    inputs:
+      tag_prefix:
+        required: false
+        type: string
+    outputs:
+      image_tag:
+        description: "The created image tag"
+        value: ${{ jobs.create-image-tag.outputs.image_tag }}
+
+jobs:
+  create-image-tag:
+    name: "Creating Image Tag"
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.create-tag.outputs.image_tag }}
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Create Tag"
+        id: create-tag
+        run: |
+          if [ "${{ inputs.tag_prefix }}" = "" ]; then
+            echo "image_tag=$(git log -1 --pretty=%h)-$(date -u +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+          else
+            echo "image_tag=${{ inputs.tag_prefix }}-$(git log -1 --pretty=%h)-$(date -u +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT 
+          fi
+          
+
+      - name: "Display Tag"
+        run: echo "${{ steps.create-tag.outputs.image_tag }}"

@@ -1,0 +1,22 @@
+name: Build production and push to preproduction
+
+on:
+  push:
+    branches: [novaprime/production]
+
+jobs:
+  create-image-tag:
+    name: "Creating Image Tag"
+    uses: ./.github/workflows/workflow-image-tag.yml    
+    with:
+      tag_prefix: 'production'
+
+  build-image:
+    name: "Build and Push Container Image"
+    needs:
+      - create-image-tag
+    secrets: inherit
+    uses: ./.github/workflows/workflow-build-images.yml    
+    with:
+      image_tag: ${{ needs.create-image-tag.outputs.image_tag }}
+      push_images: true

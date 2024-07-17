@@ -7,14 +7,14 @@ on:
 jobs:
   create-image-tag:
     name: "Creating Image Tag"
-    uses: ./.github/workflows/workflow-image-tag.yml    
+    uses: ./.github/workflows/novaprime-workflow-image-tag.yml
 
   build-image:
     name: "Build and Push Container Image"
     needs:
       - create-image-tag
     secrets: inherit
-    uses: ./.github/workflows/workflow-build-images.yml    
+    uses: ./.github/workflows/novaprime-workflow-build-images.yml
     with:
       image_tag: ${{ needs.create-image-tag.outputs.image_tag }}
       push_images: true

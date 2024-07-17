@@ -1,0 +1,23 @@
+name: Build container images for a production PR and push to staging
+
+on:
+  pull_request:
+    branches: [novaprime/production]
+
+jobs:
+  create-image-tag:
+    name: "Creating Image Tag"
+    uses: ./.github/workflows/novaprime-workflow-image-tag.yml
+    with:
+      tag_prefix: 'staging'
+
+  build-image:
+    name: "Build Container Image"
+    needs:
+      - create-image-tag
+    secrets: inherit
+    uses: ./.github/workflows/novaprime-workflow-build-images.yml
+    with:
+      image_tag: ${{ needs.create-image-tag.outputs.image_tag }}
+      push_images: true
+

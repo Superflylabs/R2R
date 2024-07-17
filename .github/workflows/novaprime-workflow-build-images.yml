@@ -1,0 +1,46 @@
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        required: true
+        type: string
+      push_images:
+        default: false
+        type: boolean
+
+jobs:
+  build-images:
+    name: Build images
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ inputs.image_tag }}
+      REPOSITORY_URI: '795041763704.dkr.ecr.us-east-2.amazonaws.com/novaprime-r2r'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Build and Push docker images
+        run: |
+          # Build the image
+          docker build -t ${REPOSITORY_URI}:${IMAGE_TAG:-latest} .
+          
+          # If the push_images parameter was set to true, push the image to the repository
+          if [ "${{ inputs.push_images }}" = "true" ]; then
+            docker push ${REPOSITORY_URI}:${IMAGE_TAG:-latest}  
+          fi
+      
+      - name: List docker images
+        run: docker image ls

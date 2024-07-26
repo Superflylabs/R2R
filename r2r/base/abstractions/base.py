@@ -51,6 +51,7 @@ class AsyncSyncMeta(type):
                                     result = loop.run_until_complete(
                                         async_method(self, *args, **kwargs)
                                     )
+                                    loop.run_until_complete(asyncio.sleep(0))
                                 except Exception as e:
                                     exception = e
                                 finally:
@@ -64,6 +65,7 @@ class AsyncSyncMeta(type):
                                         loop.run_until_complete(
                                             loop.shutdown_asyncgens()
                                         )
+                                        loop.run_until_complete(asyncio.sleep(0))
                                         loop.close()
 
                             thread = Thread(target=run)

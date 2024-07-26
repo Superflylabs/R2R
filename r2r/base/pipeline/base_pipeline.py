@@ -60,6 +60,7 @@ class AsyncPipeline:
         *args: Any,
         **kwargs: Any,
     ):
+        logger.debug(f"run: entered")
         """Run the pipeline."""
         run_manager = run_manager or self.run_manager
 
@@ -80,8 +81,10 @@ class AsyncPipeline:
                     is_info_log=True,
                 )
             try:
+                logger.debug(f"run: about to run pipes count {len(self.pipes)}")
                 for pipe_num in range(len(self.pipes)):
                     config_name = self.pipes[pipe_num].config.name
+                    logger.debug(f"run: about to run pipe {config_name}")
                     self.futures[config_name] = asyncio.Future()
 
                     current_input = self._run_pipe(
@@ -94,6 +97,7 @@ class AsyncPipeline:
                     self.futures[config_name].set_result(current_input)
                 if not stream:
                     final_result = await self._consume_all(current_input)
+                    logger.debug(f"run: got final_result. done")
                     return final_result
                 else:
                     return current_input
@@ -121,6 +125,7 @@ class AsyncPipeline:
         *args: Any,
         **kwargs: Any,
     ):
+        logger.debug(f"_run_pipe: entered")
         # Collect inputs, waiting for the necessary futures
         pipe = self.pipes[pipe_num]
         add_upstream_outputs = self.sort_upstream_outputs(
@@ -155,7 +160,7 @@ class AsyncPipeline:
             )
             if upstream_pipe_name == self.pipes[pipe_num - 1].config.name:
                 input_dict["message"] = replay_items_as_async_gen(temp_results)
-
+            logger.debug(f"_run_pipe: got upstream_inputs")
             for upstream_input in upstream_inputs:
                 outputs = await self.state.get(upstream_pipe_name, "output")
                 prev_output_field = upstream_input.get(
@@ -169,6 +174,7 @@ class AsyncPipeline:
                     prev_output_field
                 ]
 
+        logger.debug(f"_run_pipe: about to run all pipes. done")
         # Handle the pipe generator
         async for ele in await pipe.run(
             pipe.Input(**input_dict),
@@ -178,6 +184,9 @@ class AsyncPipeline:
             **kwargs,
         ):
             yield ele
+
+        logger.debug(f"_run_pipe: ran all pipes. done")
+
 
     def sort_upstream_outputs(
         self, add_upstream_outputs: list[dict[str, str]]

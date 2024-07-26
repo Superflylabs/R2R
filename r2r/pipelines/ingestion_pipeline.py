@@ -36,6 +36,7 @@ class IngestionPipeline(AsyncPipeline):
         *args: Any,
         **kwargs: Any,
     ) -> None:
+        logger.debug(f"run: entered")
         self.state = state or AsyncState()
         async with manage_run(run_manager, self.pipeline_type):
             if log_run_info:
@@ -57,6 +58,7 @@ class IngestionPipeline(AsyncPipeline):
             kg_queue = Queue()
 
             async def enqueue_documents():
+                logger.debug(f"run.enqueue_documents: entered")
                 async for document in await self.parsing_pipe.run(
                     self.parsing_pipe.Input(message=input),
                     state,
@@ -70,11 +72,14 @@ class IngestionPipeline(AsyncPipeline):
                         await kg_queue.put(document)
                 await embedding_queue.put(None)
                 await kg_queue.put(None)
+                logger.debug(f"run.enqueue_documents: done")
 
             # Start the document enqueuing process
+            logger.debug(f"run: Start the document enqueuing process")
             enqueue_task = asyncio.create_task(enqueue_documents())
 
             # Start the embedding and KG pipelines in parallel
+            logger.debug(f"run: Start the embedding and KG pipelines in parallel")
             if self.embedding_pipeline:
                 embedding_task = asyncio.create_task(
                     self.embedding_pipeline.run(
@@ -102,6 +107,7 @@ class IngestionPipeline(AsyncPipeline):
                 )
 
             # Wait for the enqueueing task to complete
+            logger.debug(f"run: Wait for the enqueueing task to complete")
             await enqueue_task
 
             results = {}
@@ -110,6 +116,7 @@ class IngestionPipeline(AsyncPipeline):
                 results["embedding_pipeline_output"] = await embedding_task
             if self.kg_pipeline:
                 results["kg_pipeline_output"] = await kg_task
+            logger.debug(f"run: got results. done")
             return results
 
     def add_pipe(

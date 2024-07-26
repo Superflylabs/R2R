@@ -1,3 +1,4 @@
+import os
 import logging
 
 # Keep '*' imports for enhanced development velocity
@@ -10,12 +11,24 @@ from .pipelines import *
 from .pipes import *
 from .prompts import *
 
+
+# Configure the log verbosity via environment variable
+log_level_env = os.getenv("R2R_LOG_LEVEL", "DEBUG").upper()
+log_level = {
+    "CRITICAL": logging.CRITICAL,
+    "ERROR": logging.ERROR,
+    "WARNING": logging.WARNING,
+    "INFO": logging.INFO,
+    "DEBUG": logging.DEBUG,
+    "NOTSET": logging.NOTSET,
+}.get(log_level_env, logging.DEBUG)
+
 logger = logging.getLogger("r2r")
-logger.setLevel(logging.INFO)
+logger.setLevel(log_level)
 
 # Create a console handler and set the level to info
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(log_level)
 
 # Create a formatter and set it for the handler
 formatter = logging.Formatter(
@@ -27,7 +40,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 # Optional: Prevent propagation to the root logger
-logger.propagate = False
+logger.propagate = True
 
 __all__ = [
     "R2RException",

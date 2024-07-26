@@ -35,5 +35,8 @@ EXPOSE 8000
 
 ENV PYTHONUNBUFFERED=1
 
+ENV PYTHONASYNCIODEBUG=1
+
 # Run the application
-CMD ["uvicorn", "r2r.main.app_entry:app", "--host", "0.0.0.0", "--port", "8000"]
+#CMD ["uvicorn", "r2r.main.app_entry:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "r2r.main.app_entry:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]

@@ -11,24 +11,31 @@ from .pipelines import *
 from .pipes import *
 from .prompts import *
 
-
-# Configure the log verbosity via environment variable
-log_level_env = os.getenv("R2R_LOG_LEVEL", "DEBUG").upper()
-log_level = {
+log_levels = {
     "CRITICAL": logging.CRITICAL,
     "ERROR": logging.ERROR,
     "WARNING": logging.WARNING,
     "INFO": logging.INFO,
     "DEBUG": logging.DEBUG,
     "NOTSET": logging.NOTSET,
-}.get(log_level_env, logging.DEBUG)
+}
+
+# Configure the log verbosity via environment variable
+r2r_log_level = log_levels.get(os.getenv("R2R_LOG_LEVEL", "DEBUG").upper(), logging.DEBUG)
+
+asyncio_log_level = log_levels.get(os.getenv("ASYNCIO_LOG_LEVEL", "DEBUG").upper(), logging.DEBUG)
+logging.getLogger("asyncio").setLevel(asyncio_log_level)
+
+sqlalchemy_log_level = log_levels.get(os.getenv("SQLALCHEMY_LOG_LEVEL", "DEBUG").upper(), logging.DEBUG)
+logging.getLogger('sqlalchemy.engine').setLevel(sqlalchemy_log_level)
+logging.getLogger('sqlalchemy.pool').setLevel(sqlalchemy_log_level)
 
 logger = logging.getLogger("r2r")
-logger.setLevel(log_level)
+logger.setLevel(r2r_log_level)
 
 # Create a console handler and set the level to info
 ch = logging.StreamHandler()
-ch.setLevel(log_level)
+ch.setLevel(r2r_log_level)
 
 # Create a formatter and set it for the handler
 formatter = logging.Formatter(

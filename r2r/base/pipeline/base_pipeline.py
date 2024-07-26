@@ -231,3 +231,4 @@ async def dequeue_requests(queue: asyncio.Queue) -> AsyncGenerator:
         if request is None:
             break
         yield request
+        queue.task_done()

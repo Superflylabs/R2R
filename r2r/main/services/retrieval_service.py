@@ -102,6 +102,7 @@ class RetrievalService(Service):
         *args,
         **kwargs,
     ):
+        logger.debug(f"rag: entered")
         async with manage_run(self.run_manager, "rag_app") as run_id:
             try:
                 t0 = time.time()
@@ -152,6 +153,8 @@ class RetrievalService(Service):
                     **kwargs,
                 )
 
+                logger.debug(f"rag: got rag_pipeline results")
+
                 t1 = time.time()
                 latency = f"{t1 - t0:.2f}"
 
@@ -171,6 +174,7 @@ class RetrievalService(Service):
                         f"Multiple results found for query: {query}"
                     )
                 # unpack the first result
+                logger.debug(f"rag: done")
                 return results[0]
 
             except Exception as e:

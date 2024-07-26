@@ -239,5 +239,7 @@ async def dequeue_requests(queue: asyncio.Queue) -> AsyncGenerator:
         request = await queue.get()
         if request is None:
             break
+        logger.debug(f"dequeue_requests: about to run the request")
         yield request
         queue.task_done()
+        logger.debug(f"dequeue_requests: done")

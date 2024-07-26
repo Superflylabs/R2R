@@ -23,6 +23,8 @@ log_level = {
     "NOTSET": logging.NOTSET,
 }.get(log_level_env, logging.DEBUG)
 
+logging.getLogger("asyncio").setLevel(log_level)
+
 logger = logging.getLogger("r2r")
 logger.setLevel(log_level)
 

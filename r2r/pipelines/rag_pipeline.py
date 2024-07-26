@@ -39,6 +39,7 @@ class RAGPipeline(AsyncPipeline):
         *args: Any,
         **kwargs: Any,
     ):
+        logger.debug(f"run: entered")
         self.state = state or AsyncState()
         async with manage_run(run_manager, self.pipeline_type):
             if log_run_info:
@@ -54,6 +55,7 @@ class RAGPipeline(AsyncPipeline):
                 )
 
             async def multi_query_generator(input):
+                logger.debug(f"multi_query_generator: entered")
                 tasks = []
                 async for query in input:
                     task = asyncio.create_task(
@@ -73,6 +75,7 @@ class RAGPipeline(AsyncPipeline):
 
                 for query, task in tasks:
                     yield (query, await task)
+                logger.debug(f"run.multi_query_generator: done")
 
             rag_results = await self._rag_pipeline.run(
                 input=multi_query_generator(input),
@@ -84,6 +87,7 @@ class RAGPipeline(AsyncPipeline):
                 *args,
                 **kwargs,
             )
+            logger.debug(f"run: got rag_results. done")
             return rag_results
 
     def add_pipe(

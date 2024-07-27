@@ -86,6 +86,7 @@ class AsyncPipeline:
                 for pipe_num in range(len(self.pipes)):
                     config_name = self.pipes[pipe_num].config.name
                     logger.debug(f"{await run_manager.get_run_info()} run: about to run pipe {config_name}")
+                    logger.debug(f"{await run_manager.get_run_info()} run: futures before run {self.futures}")
                     self.futures[config_name] = asyncio.Future()
 
                     current_input = self._run_pipe(
@@ -96,6 +97,7 @@ class AsyncPipeline:
                         **kwargs,
                     )
                     self.futures[config_name].set_result(current_input)
+                    logger.debug(f"{await run_manager.get_run_info()} run: futures after run {self.futures}")
                     logger.debug(f"{await run_manager.get_run_info()} run: result for future: {config_name} result: {current_input}")
                 if not stream:
                     final_result = await self._consume_all(current_input)

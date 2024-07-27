@@ -115,8 +115,18 @@ class AsyncPipe:
         while True:
             log_data = await self.log_queue.get()
             run_id, key, value = log_data
-            await self.pipe_logger.log(run_id, key, value)
-            self.log_queue.task_done()
+            try:
+                await asyncio.wait_for(self.pipe_logger.log(run_id, key, value), timeout=2)
+            except asyncio.TimeoutError:
+                logger.warning(
+                    f"Log worker for pipe {self.config.name} timed out while logging {key}: {value}"
+                )
+            except asyncio.CancelledError:
+                logger.warning(
+                    f"Log worker for pipe {self.config.name} was cancelled {key}: {value}"
+                )
+            finally:
+                self.log_queue.task_done()
 
     async def enqueue_log(self, run_id: uuid.UUID, key: str, value: str):
         if self.log_queue.qsize() < self.config.max_log_queue_size:

@@ -1,3 +1,4 @@
+import logging
 from fastapi.responses import StreamingResponse
 
 from r2r.base import GenerationConfig, KGSearchSettings, VectorSearchSettings
@@ -6,6 +7,7 @@ from ...engine import R2REngine
 from ..requests import R2REvalRequest, R2RRAGRequest, R2RSearchRequest
 from .base_router import BaseRouter
 
+logger = logging.getLogger(__name__)
 
 class RetrievalRouter(BaseRouter):
     def __init__(self, engine: R2REngine):
@@ -38,6 +40,7 @@ class RetrievalRouter(BaseRouter):
         @self.router.post("/rag")
         @self.base_endpoint
         async def rag_app(request: R2RRAGRequest):
+            logger.debug(f"rag_app: entered")
             if "agent_generation_config" in request.kg_search_settings:
                 request.kg_search_settings["agent_generation_config"] = (
                     GenerationConfig(
@@ -74,6 +77,7 @@ class RetrievalRouter(BaseRouter):
                     stream_generator(), media_type="application/json"
                 )
             else:
+                logger.debug(f"rag_app: got response. done")
                 return response
 
         @self.router.post("/evaluate")

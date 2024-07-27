@@ -108,6 +108,7 @@ class SearchPipeline(AsyncPipeline):
         )
         kg_results = await kg_task if do_kg else None
 
+        logger.debug(f"search_pipeline.run: done. input: {' '.join(str(result) for result in vector_search_results)}")
         return AggregateSearchResult(
             vector_search_results=vector_search_results,
             kg_search_results=kg_results,

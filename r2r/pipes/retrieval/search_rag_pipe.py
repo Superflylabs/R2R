@@ -70,13 +70,16 @@ class SearchRAGPipe(GeneratorPipe):
         response = await self.llm_provider.aget_completion(
             messages=messages, generation_config=rag_generation_config
         )
+        logger.debug(f"RAG response: {response.choices[0].message.content}")
         yield RAGCompletion(completion=response, search_results=search_results)
 
+        logger.debug(f"enqueue log llm_response log for {messages}")
         await self.enqueue_log(
             run_id=run_id,
             key="llm_response",
             value=response.choices[0].message.content,
         )
+        logger.debug(f"search_rag_pipe._run_logic: done")
 
     def _get_message_payload(self, query: str, context: str) -> dict:
         return [

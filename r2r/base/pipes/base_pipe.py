@@ -153,11 +153,17 @@ class AsyncPipe:
                     async for result in self._run_logic(
                         input, state, run_id=run_id, *args, **kwargs
                     ):
+                        logger.debug(f"{run_manager.get_run_info()} base_pipe.manage_run before _run_logic {self.config.name}")
                         yield result
+                        logger.debug(f"{run_manager.get_run_info()} base_pipe.manage_run after _run_logic {self.config.name}")
                 finally:
+                    logger.debug(f"{run_manager.get_run_info()} base_pipe.manage_run.finally before join {self.config.name}")
                     await self.log_queue.join()
+                    logger.debug(f"{run_manager.get_run_info()} base_pipe.manage_run.finally after join {self.config.name}")
                     self.log_worker_task.cancel()
+                    logger.debug(f"{run_manager.get_run_info()} base_pipe.manage_run.finally after cancel {self.config.name}")
                     self.log_queue = asyncio.Queue()
+                    logger.debug(f"{run_manager.get_run_info()} base_pipe.manage_run.finally log_queue is reset. {self.config.name} done.")
 
         return wrapped_run()
 

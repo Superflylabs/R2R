@@ -90,11 +90,11 @@ class StreamingSearchRAGPipe(SearchRAGPipe):
 
             yield f"</{self.COMPLETION_STREAM_MARKER}>"
 
-            await self.enqueue_log(
-                run_id=run_id,
-                key="llm_response",
-                value=response,
-            )
+            # await self.enqueue_log(
+            #     run_id=run_id,
+            #     key="llm_response",
+            #     value=response,
+            # )
 
     async def _yield_chunks(
         self,

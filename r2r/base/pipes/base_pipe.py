@@ -111,26 +111,26 @@ class AsyncPipe:
     def type(self) -> PipeType:
         return self._type
 
-    async def log_worker(self):
-        while True:
-            log_data = await self.log_queue.get()
-            run_id, key, value = log_data
-            try:
-                await asyncio.wait_for(self.pipe_logger.log(run_id, key, value), timeout=2)
-            except asyncio.TimeoutError:
-                logger.warning(
-                    f"Log worker for pipe {self.config.name} timed out while logging {key}: {value}"
-                )
-            except asyncio.CancelledError:
-                logger.warning(
-                    f"Log worker for pipe {self.config.name} was cancelled {key}: {value}"
-                )
-            finally:
-                self.log_queue.task_done()
+    # async def log_worker(self):
+    #     while True:
+    #         try:
+    #             log_data = await self.log_queue.get()
+    #             run_id, key, value = log_data
+    #             await asyncio.wait_for(self.pipe_logger.log(run_id, key, value), timeout=2)
+    #         except asyncio.TimeoutError:
+    #             logger.warning(
+    #                 f"Log worker for pipe {self.config.name} timed out while logging"
+    #             )
+    #         except asyncio.CancelledError:
+    #             logger.warning(
+    #                 f"Log worker for pipe {self.config.name} was cancelled"
+    #             )
+    #         finally:
+    #             self.log_queue.task_done()
 
-    async def enqueue_log(self, run_id: uuid.UUID, key: str, value: str):
-        if self.log_queue.qsize() < self.config.max_log_queue_size:
-            await self.log_queue.put((run_id, key, value))
+    # async def enqueue_log(self, run_id: uuid.UUID, key: str, value: str):
+    #     if self.log_queue.qsize() < self.config.max_log_queue_size:
+    #         await self.log_queue.put((run_id, key, value))
 
     async def run(
         self,
@@ -146,9 +146,9 @@ class AsyncPipe:
 
         async def wrapped_run() -> AsyncGenerator[Any, None]:
             async with manage_run(run_manager, self.config.name) as run_id:
-                self.log_worker_task = asyncio.create_task(
-                    self.log_worker(), name=f"log-worker-{self.config.name}"
-                )
+                # self.log_worker_task = asyncio.create_task(
+                #     self.log_worker(), name=f"log-worker-{self.config.name}"
+                # )
                 try:
                     async for result in self._run_logic(
                         input, state, run_id=run_id, *args, **kwargs
@@ -157,13 +157,14 @@ class AsyncPipe:
                         yield result
                         logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run after _run_logic {self.config.name}")
                 finally:
-                    logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally before join {self.config.name}")
-                    await self.log_queue.join()
-                    logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally after join {self.config.name}")
-                    self.log_worker_task.cancel()
-                    logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally after cancel {self.config.name}")
-                    self.log_queue = asyncio.Queue()
-                    logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally log_queue is reset. {self.config.name} done.")
+                    logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally {self.config.name}")
+                    # logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally before join {self.config.name}")
+                    # await self.log_queue.join()
+                    # logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally after join {self.config.name}")
+                    # self.log_worker_task.cancel()
+                    # logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally after cancel {self.config.name}")
+                    # self.log_queue = asyncio.Queue()
+                    # logger.debug(f"{await run_manager.get_run_info()} base_pipe.manage_run.finally log_queue is reset. {self.config.name} done.")
 
         return wrapped_run()
 

@@ -79,17 +79,17 @@ class KGAgentSearchPipe(GeneratorPipe):
             result = self.kg_provider.structured_query(query)
             yield (query, result)
 
-            await self.enqueue_log(
-                run_id=run_id,
-                key="kg_agent_response",
-                value=extraction,
-            )
-
-            await self.enqueue_log(
-                run_id=run_id,
-                key="kg_agent_execution_result",
-                value=result,
-            )
+            # await self.enqueue_log(
+            #     run_id=run_id,
+            #     key="kg_agent_response",
+            #     value=extraction,
+            # )
+            #
+            # await self.enqueue_log(
+            #     run_id=run_id,
+            #     key="kg_agent_execution_result",
+            #     value=result,
+            # )
 
     def _get_message_payload(self, message: str) -> dict:
         return [

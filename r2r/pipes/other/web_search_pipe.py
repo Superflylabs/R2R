@@ -42,9 +42,9 @@ class WebSearchPipe(SearchPipe):
         **kwargs: Any,
     ) -> AsyncGenerator[VectorSearchResult, None]:
         search_limit_override = kwargs.get("search_limit", None)
-        await self.enqueue_log(
-            run_id=run_id, key="search_query", value=message
-        )
+        # await self.enqueue_log(
+        #     run_id=run_id, key="search_query", value=message
+        # )
         # TODO - Make more general in the future by creating a SearchProvider interface
         results = self.serper_client.get_raw(
             query=message,
@@ -66,11 +66,11 @@ class WebSearchPipe(SearchPipe):
             search_results.append(search_result)
             yield search_result
 
-        await self.enqueue_log(
-            run_id=run_id,
-            key="search_results",
-            value=json.dumps([ele.json() for ele in search_results]),
-        )
+        # await self.enqueue_log(
+        #     run_id=run_id,
+        #     key="search_results",
+        #     value=json.dumps([ele.json() for ele in search_results]),
+        # )
 
     async def _run_logic(
         self,

@@ -75,13 +75,12 @@ class RAGPipeline(AsyncPipeline):
                     tasks.append((query, task))
 
                 for query, task in tasks:
-                    logger.debug(f"rag_pipeline.multi_query_generator: executing task for {query}")
                     yield (query, await task)
-                    logger.debug(f"rag_pipeline.multi_query_generator: task done for {query}")
 
                 logger.debug(f"rag_pipeline.run.multi_query_generator: done.")
 
             rag_results = await self._rag_pipeline.run(
+                # multi_query_generator is good
                 input=multi_query_generator(input),
                 state=state,
                 stream=rag_generation_config.stream,

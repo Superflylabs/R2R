@@ -159,20 +159,20 @@ class AsyncPipeline:
                 # consume the async generator
                 return [item async for item in result]
 
-            # async def replay_items_as_async_gen(items):
-            #     for item in items:
-            #         yield item
+            async def replay_items_as_async_gen(items):
+                for item in items:
+                    yield item
 
-            # temp_results = await resolve_future_output(
-            #     self.futures[upstream_pipe_name]
-            # )
+            temp_results = await resolve_future_output(
+                self.futures[upstream_pipe_name]
+            )
             await resolve_future_output(
                 self.futures[upstream_pipe_name]
             )
 
             # What is happening here, if upstream_pipe_name is never defined...?
-            # if upstream_pipe_name == self.pipes[pipe_num - 1].config.name:
-            #     input_dict["message"] = replay_items_as_async_gen(temp_results)
+            if upstream_pipe_name == self.pipes[pipe_num - 1].config.name:
+                input_dict["message"] = replay_items_as_async_gen(temp_results)
             logger.debug(f"{await run_manager.get_run_info()} _run_pipe: got upstream_inputs")
             for upstream_input in upstream_inputs:
                 outputs = await self.state.get(upstream_pipe_name, "output")
